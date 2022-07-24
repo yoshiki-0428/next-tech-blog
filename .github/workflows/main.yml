@@ -37,7 +37,6 @@ jobs:
         run: |
           git config --global user.email "bot@a.b"
           git config --global user.name "bot"
-          git add content/posts/.
-          git add content/sync_notion/package-lock.json
+          git add data/blog/.
           git status
           git commit --allow-empty -m 'edit by notion data' && git push ${REPO} ${{github.event.pull_request.head.ref}}
