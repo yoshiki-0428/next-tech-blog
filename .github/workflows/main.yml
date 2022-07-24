@@ -1,0 +1,44 @@
+on: [push]
+#on:
+#  schedule:
+    # @see https://crontab.guru/#0_0_*/7_*_*
+#    - cron:  '0 0 */7 * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        id: setup_node_id
+        with:
+          node-version: 16
+          cache: npm
+      - uses: actions/checkout@v3
+        with:
+          repository: 'yoshiki-0428/sync_notion'
+          path: 'sync'
+      - name: Create dot env file
+        run: |
+          touch .env
+          echo "NOTION_SECRET_API=${{ secrets.NOTION_SECRET_API }}" >> .env
+          echo "NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}" >> .env
+          echo "UPLOADCARE_PUBLIC_KEY=${{ secrets.UPLOADCARE_PUBLIC_KEY }}" >> .env
+          echo "BLOG_PATH=../data/blog" >> .env
+          #echo "BLOG_DEFAULT_IMAGE={your variable}" >> .env
+        working-directory: ./sync
+      - name: yarn
+        run: yarn
+        working-directory: ./sync
+      - name: run
+        run: node build/index.js
+        working-directory: ./sync
+      - name: Git commit and push
+        run: |
+          git config --global user.email "bot@a.b"
+          git config --global user.name "bot"
+          git add content/posts/.
+          git add content/sync_notion/package-lock.json
+          git status
+          git commit --allow-empty -m 'edit by notion data' && git push ${REPO} ${{github.event.pull_request.head.ref}}
+機能
