@@ -41,4 +41,3 @@ jobs:
           git add content/sync_notion/package-lock.json
           git status
           git commit --allow-empty -m 'edit by notion data' && git push ${REPO} ${{github.event.pull_request.head.ref}}
-機能
